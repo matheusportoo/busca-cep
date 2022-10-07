@@ -8,9 +8,17 @@ import (
 	"net/url"
 )
 
-func GetCep(cep string) Response {
+type Correios struct {
+	Cep string
+}
+
+func New(cep string) *Correios {
+	return &Correios{cep}
+}
+
+func (s *Correios) GetCep() Response {
 	formData := url.Values{
-		"cep": {cep},
+		"cep": {s.Cep},
 	}
 
 	resp, err := http.PostForm("https://buscacepinter.correios.com.br/app/cep/carrega-cep.php", formData)
@@ -33,7 +41,7 @@ func GetCep(cep string) Response {
 	return cepResponse
 }
 
-func Print(r Response) {
+func (s Correios) Print(r Response) {
 	fmt.Println()
 	fmt.Println("************************")
 	fmt.Printf("Response: %s \n", "Correios")

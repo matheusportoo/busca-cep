@@ -7,8 +7,16 @@ import (
 	"net/http"
 )
 
-func GetCep(cep string) Response {
-	var url string = fmt.Sprintf("https://ws.apicep.com/busca-cep/api/cep/%s.json", cep)
+type WSApiCep struct {
+	Cep string
+}
+
+func New(cep string) *WSApiCep {
+	return &WSApiCep{cep}
+}
+
+func (s *WSApiCep) GetCep() Response {
+	var url string = fmt.Sprintf("https://ws.apicep.com/busca-cep/api/cep/%s.json", s.Cep)
 	resp, err := http.Get(url)
 
 	if err != nil {
@@ -29,7 +37,7 @@ func GetCep(cep string) Response {
 	return cepResponse
 }
 
-func Print(r Response) {
+func (s WSApiCep) Print(r Response) {
 	fmt.Println()
 	fmt.Println("************************")
 	fmt.Printf("Response: %s \n", "WS api cep")

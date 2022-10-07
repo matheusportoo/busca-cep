@@ -7,8 +7,16 @@ import (
 	"net/http"
 )
 
-func GetCep(cep string) Response {
-	var url string = fmt.Sprintf("https://viacep.com.br/ws/%s/json", cep)
+type ViaCep struct {
+	Cep string
+}
+
+func New(cep string) *ViaCep {
+	return &ViaCep{cep}
+}
+
+func (s *ViaCep) GetCep() Response {
+	var url string = fmt.Sprintf("https://viacep.com.br/ws/%s/json", s.Cep)
 	resp, err := http.Get(url)
 
 	if err != nil {
@@ -29,7 +37,7 @@ func GetCep(cep string) Response {
 	return cepResponse
 }
 
-func Print(r Response) {
+func (s ViaCep) Print(r Response) {
 	fmt.Println("************************")
 	fmt.Printf("Response: %s \n", "Viacep")
 	fmt.Println("************************")

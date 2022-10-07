@@ -5,10 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/matheusportoo/busca-cep/services/brasilapi"
-	"github.com/matheusportoo/busca-cep/services/correios"
-	"github.com/matheusportoo/busca-cep/services/viacep"
-	"github.com/matheusportoo/busca-cep/services/wsapicep"
+	"github.com/matheusportoo/busca-cep/services"
 )
 
 func main() {
@@ -16,12 +13,14 @@ func main() {
 	cep := "14406-346"
 	t := time.Now()
 
+	services := services.New(cep)
+
 	fmt.Printf("fetching cep %s \n", cep)
 
-	go getCepBy("viacep", cep, cancel)
-	go getCepBy("wsapicep", cep, cancel)
-	go getCepBy("brasilapi", cep, cancel)
-	go getCepBy("correios", cep, cancel)
+	go getCepBy(services, "viacep", cep, cancel)
+	go getCepBy(services, "wsapicep", cep, cancel)
+	go getCepBy(services, "brasilapi", cep, cancel)
+	go getCepBy(services, "correios", cep, cancel)
 
 	wait(ctx, t)
 
@@ -38,26 +37,30 @@ func wait(ctx context.Context, t time.Time) {
 	}
 }
 
-func getCepBy(service string, cep string, cancel context.CancelFunc) {
+func getCepBy(services *services.Services, serviceName string, cep string, cancel context.CancelFunc) {
 	defer cancel()
 
-	if (service == "viacep") {
-		viacepResponse := viacep.GetCep(cep)
-		viacep.Print(viacepResponse)
+	if serviceName == "viacep" {
+		viacepResponse := services.ViaCep.GetCep()
+		services.ViaCep.Print(viacepResponse)
+		return
 	}
 
-	if (service == "wsapicep") {
-		wsapicepResponse := wsapicep.GetCep(cep)
-		wsapicep.Print(wsapicepResponse)
+	if serviceName == "wsapicep" {
+		wsapicepResponse := services.WSApiCep.GetCep()
+		services.WSApiCep.Print(wsapicepResponse)
+		return
 	}
 
-	if (service == "brasilapi") {
-		brasilapiResponse := brasilapi.GetCep(cep)
-		brasilapi.Print(brasilapiResponse)
+	if serviceName == "brasilapi" {
+		brasilapiResponse := services.BrasilApi.GetCep()
+		services.BrasilApi.Print(brasilapiResponse)
+		return
 	}
 
-	if (service == "correios") {
-		correiosResponse := correios.GetCep(cep)
-		correios.Print(correiosResponse)
+	if serviceName == "correios" {
+		correiosResponse := services.Correios.GetCep()
+		services.Correios.Print(correiosResponse)
+		return
 	}
 }
